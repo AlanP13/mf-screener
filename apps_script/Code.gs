@@ -355,12 +355,12 @@ function buildQueryTabs_(ss) {
 
   const rk = ss.getSheetByName(TAB.rank);
   rk.clear();
-  title_(rk, 'Rankings', 'Left: qualifiers ranked by quality score. Right: long-term leaders among funds meeting the AUM minimum with 5+ years of history, whatever the return threshold.');
+  title_(rk, 'Rankings', 'Left: qualifiers ranked by quality score. Right: top 50 by performance score among funds meeting the AUM minimum with 5+ years of history, whatever the return threshold. Quality score is a percentile within each fund\'s own category, so compare it across funds in the same category.');
   const rCols = ['rank', 'name', 'cat', 'result', 'quality', 'perf', 'pperf', 'pcons', 'psharpe', 'pmdd', 'status', 'streak', 'signal'];
   rk.getRange('A4').setFormula('=IFERROR(QUERY(' + ALLREF + end + ',"select ' + q_(rCols) + ' where ' + rs + " ends with 'qualifier' order by " + L('rank') + ' asc",1),"No qualifiers today.")');
-  const lCols = ['name', 'cat', 'quality', 'perf', 'r5', 'r10', 'rsi', 'sharpe', 'mdd', 'cons', 'result'];
+  const lCols = ['name', 'cat', 'perf', 'r5', 'r10', 'rsi', 'sharpe', 'mdd', 'cons', 'quality', 'result'];
   const lStart = rCols.length + 2;
-  rk.getRange(4, lStart).setFormula('=IFERROR(QUERY(' + ALLREF + end + ',"select ' + q_(lCols) + ' where ' + L('aumok') + ' = true and ' + L('elig') + ' = true and ' + L('r5') + ' is not null order by ' + L('quality') + ' desc limit 50",1),"")');
+  rk.getRange(4, lStart).setFormula('=IFERROR(QUERY(' + ALLREF + end + ',"select ' + q_(lCols) + ' where ' + L('aumok') + ' = true and ' + L('elig') + ' = true and ' + L('r5') + ' is not null order by ' + L('perf') + ' desc limit 50",1),"")');
   formatQueryTab_(rk, rCols, 4, 1);
   formatQueryTab_(rk, lCols, 4, lStart);
 
@@ -477,7 +477,15 @@ function buildLogTabs_(ss) {
 }
 
 // ---------------------------------------------------------------- Dashboard
-const DASH = { kpiRow: 4, sections: 7, gap: 15, monthlyCol: 16 };
+const DASH = { kpiRow: 4, sections: 7, gap: 14, monthlyCol: 16 };
+const K = {
+  qual: ['rank', 'name', 'cat', 'result', 'status', 'streak', 'quality', 'r1', 'r3', 'r5', 'r10', 'aum'],
+  best: ['name', 'cat', 'perf', 'r1', 'r3', 'r5', 'r10', 'rsi', 'sharpe', 'mdd', 'quality', 'result'],
+  close: ['name', 'cat', 'fail', 'appl', 'perf', 'r1', 'r2', 'r3', 'r5', 'r10', 'rsi', 'aum'],
+  streak: ['name', 'cat', 'streak', 'months', 'status', 'result', 'quality', 'r5', 'r10', 'aum'],
+  fresh: ['name', 'cat', 'result', 'quality', 'r1', 'r3', 'r5', 'r10', 'aum'],
+  recent: ['name', 'cat', 'r1', 'r2', 'r3', 'r5', 'aum', 'quality']
+};
 
 function buildDashboard_(ss) {
   const sh = ss.getSheetByName(TAB.dash);
@@ -507,14 +515,27 @@ function buildDashboard_(ss) {
   const Q = (where, keys, order, limit) => '=IFERROR(QUERY(' + ALLREF + end + ',"select ' + sel(keys) + ' where ' + where +
     (order ? ' order by ' + order : '') + ' limit ' + limit + '",1),"None.")';
   const rsc = L('result'), stc = L('status');
+  const base = L('aumok') + ' = true and ' + L('elig') + ' = true';
+  const dropped = '=IFERROR(QUERY(' + ALLREF + end + ',"select ' + sel(['name', 'cat', 'status', 'since', 'months', 'result', 'r1', 'r3', 'r5', 'aum']) +
+    ' where ' + stc + " = 'WATCH' or " + stc + " = 'REVIEW' or (" + stc + " = 'REMOVED' and " + L('since') +
+    " >= date '\"&TEXT(TODAY()-92,\"yyyy-mm-dd\")&\"') order by " + L('since') + ' desc limit 10",1),"None.")';
+  // [title, formula, column keys (for number formats)]
   const sections = [
-    ['Current qualifiers: which funds meet every requirement today?', Q(rsc + " ends with 'qualifier'", ['rank', 'name', 'cat', 'result', 'status', 'streak', 'quality', 'r1', 'r3', 'r5', 'r10', 'aum'], L('quality') + ' desc', 10)],
-    ['Consecutive months qualified: who has stayed in the screen longest?', Q(L('streak') + ' > 0', ['name', 'cat', 'streak', 'months', 'status', 'result', 'quality', 'r5', 'r10', 'aum'], L('streak') + ' desc, ' + L('quality') + ' desc', 10)],
-    ['New entrants this month', Q(stc + " = 'NEW' and " + L('streak') + ' = 1', ['name', 'cat', 'result', 'quality', 'r1', 'r3', 'r5', 'r10', 'aum'], L('quality') + ' desc', 10)],
-    ['Dropped or at risk: former qualifiers failing the screen', '=IFERROR(QUERY(' + ALLREF + end + ',"select ' + sel(['name', 'cat', 'status', 'since', 'months', 'result', 'r1', 'r3', 'r5', 'aum']) + ' where ' + stc + " = 'WATCH' or " + stc + " = 'REVIEW' or (" + stc + " = 'REMOVED' and " + L('since') + " >= date '\"&TEXT(TODAY()-92,\"yyyy-mm-dd\")&\"') order by " + L('since') + ' desc limit 10",1),"None.")'],
-    ['Recent outperformers: strong 1-3 year results, short record', Q(rsc + " = 'Recent outperformer'", ['name', 'cat', 'r1', 'r2', 'r3', 'r5', 'aum', 'quality'], L('r1') + ' desc', 10)],
-    ['Best long-term performers at any threshold (AUM minimum met, 5+ years)', Q(L('aumok') + ' = true and ' + L('elig') + ' = true and ' + L('r5') + ' is not null', ['name', 'cat', 'quality', 'r1', 'r3', 'r5', 'r10', 'rsi', 'sharpe', 'mdd', 'result'], L('quality') + ' desc', 10)],
-    ['Portfolio alerts: held funds needing review', '=IFERROR(QUERY(Portfolio!A4:Q,"select F, G, L, M, N, P, Q where A is not null and Q <> \'OK\'",1),"None.")']
+    ['Current qualifiers: which funds meet every requirement today?',
+      Q(rsc + " ends with 'qualifier'", K.qual, L('quality') + ' desc', 10), K.qual],
+    ['Best long-term performers: strongest persistent returns among funds meeting the AUM minimum (5+ years, any threshold)',
+      Q(base + ' and ' + L('r5') + ' is not null', K.best, L('perf') + ' desc', 10), K.best],
+    ['Closest to qualifying: fewest failed checks against the Settings thresholds',
+      Q(base + ' and ' + L('r3') + ' is not null and not (' + rsc + " ends with 'qualifier')", K.close, L('fail') + ' asc, ' + L('perf') + ' desc', 10), K.close],
+    ['Consecutive months qualified: who has stayed in the screen longest?',
+      Q(L('streak') + ' > 0', K.streak, L('streak') + ' desc, ' + L('quality') + ' desc', 10), K.streak],
+    ['New entrants this month', Q(stc + " = 'NEW' and " + L('streak') + ' = 1', K.fresh, L('quality') + ' desc', 10), K.fresh],
+    ['Dropped or at risk: former qualifiers on WATCH or REVIEW, or removed in the last 3 months', dropped,
+      ['name', 'cat', 'status', 'since', 'months', 'result', 'r1', 'r3', 'r5', 'aum']],
+    ['Recent outperformers: strong 1-3 year results without the long record', Q(rsc + " = 'Recent outperformer'", K.recent, L('r1') + ' desc', 10), K.recent],
+    ['Portfolio alerts: held funds needing review',
+      '=IFERROR(QUERY(Portfolio!A4:Q,"select F, G, L, M, N, P, Q where A is not null and Q <> \'OK\'",1),"None.")',
+      ['name', 'cat', 'result', 'status', 'streak', 'signal', 'flags']]
   ];
   sections.forEach((s, i) => {
     const r = DASH.sections + i * DASH.gap;
@@ -525,20 +546,17 @@ function buildDashboard_(ss) {
   const widths = [190, 120, 120, 110, 90, 90, 90, 80, 80, 80, 80, 80, 90];
   widths.forEach((w, i) => sh.setColumnWidth(i + 1, w));
   sh.setColumnWidth(1, 260);
+  ensureRows_(sh, DASH.sections + sections.length * DASH.gap + 5);
   sh.getRange(1, 1, sh.getMaxRows(), 20).setFontFamily(FONT).setFontSize(9);
   sh.getRange('A1').setFontSize(16); sh.getRange('A2').setFontSize(9);
   sh.getRange(DASH.sections, 1, sh.getMaxRows() - DASH.sections + 1, 13).setNumberFormat('General');
-  // number formats by section column
-  const pctCols = { 0: [8, 9, 10, 11], 1: [8, 9], 2: [5, 6, 7, 8], 3: [7, 8, 9], 4: [3, 4, 5, 6], 5: [4, 5, 6, 7, 8, 10], 6: [] };
-  const intCols = { 0: [1, 6, 12], 1: [3, 4, 10], 2: [9], 3: [5, 10], 4: [7], 5: [], 6: [5] };
-  const decCols = { 0: [7], 1: [7], 2: [4], 3: [], 4: [8], 5: [3, 9], 6: [] };
-  for (let i = 0; i < sections.length; i++) {
+  sections.forEach((s, i) => {
     const r0 = DASH.sections + i * DASH.gap + 2;
-    pctCols[i].forEach(c => sh.getRange(r0, c, 11, 1).setNumberFormat('0.0%'));
-    intCols[i].forEach(c => sh.getRange(r0, c, 11, 1).setNumberFormat('#,##0'));
-    decCols[i].forEach(c => sh.getRange(r0, c, 11, 1).setNumberFormat('0.0'));
-  }
-  sh.getRange(DASH.sections + 3 * DASH.gap + 2, 4, 11, 1).setNumberFormat('dd-mmm-yyyy');
+    s[2].forEach((k, j) => {
+      const t = typeOf_(k);
+      if (t !== 'str') sh.getRange(r0, j + 1, 11, 1).setNumberFormat(fmtFor_(t));
+    });
+  });
   applyTextColours_(sh, [sh.getRange(DASH.sections, 1, sections.length * DASH.gap, 13)]);
   // monthly qualifier history (written by the script) + chart
   const mc = DASH.monthlyCol;
@@ -806,6 +824,7 @@ function runStatusEngine_(ss, manifest) {
     let since = runDate;
     const statuses = months.map(m => fm[m] ? fm[m].status : '');
     for (let i = statuses.length - 1; i >= 0; i--) {
+      if (!fm[months[i]] && st.status === 'REMOVED') continue;   // removed funds stop being tracked
       if (statuses[i] === st.status && fm[months[i]]) since = fm[months[i]].date; else break;
     }
     statusOut.push([st.status, st.ever ? st.streak : '', st.status ? since : '', st.ever ? st.months : '']);
