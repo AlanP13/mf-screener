@@ -17,6 +17,9 @@ const TAB = {
   qaum: 'Quarterly AUM', set: 'Settings', src: 'Data Sources', state: '_State'
 };
 const TAB_ORDER = ['dash', 'all', 'qual', 'rank', 'watch', 'port', 'chg', 'hist', 'arch', 'qnav', 'qaum', 'set', 'src', 'state'];
+const SHEET_ID = '1snjuSUqgrIlSX1o2CtEqV-Wgp5gB3mPffiCEZ0yKrH0';
+/** Works whether the script is bound to the Sheet or created standalone at script.google.com. */
+function ss_() { return SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID); }
 const DEFAULT_DATA_URL = 'https://raw.githubusercontent.com/AlanP13/mf-screener/main/data/';
 
 // ---------------------------------------------------------------- column model
@@ -111,6 +114,7 @@ const FILL = {
 
 // ================================================================ menu & triggers
 function onOpen() {
+  try { SpreadsheetApp.getUi(); } catch (e) { return; }
   SpreadsheetApp.getUi().createMenu('MF Screener')
     .addItem('Refresh now (import latest data)', 'refreshNow')
     .addItem('Check for new data', 'checkForNewData')
@@ -139,7 +143,7 @@ function refreshNow() {
 
 // ================================================================ setup
 function setupScreener() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = ss_();
   ss.setSpreadsheetTimeZone('Asia/Kolkata');
   TAB_ORDER.forEach(k => { if (!ss.getSheetByName(TAB[k])) ss.insertSheet(TAB[k]); });
   const blank = ss.getSheetByName('Sheet1');
@@ -220,7 +224,7 @@ function settings_(ss) {
   return s;
 }
 function dataUrl_() {
-  let u = setting_(SpreadsheetApp.getActive(), 'DATA_URL') || DEFAULT_DATA_URL;
+  let u = setting_(ss_(), 'DATA_URL') || DEFAULT_DATA_URL;
   return u.slice(-1) === '/' ? u : u + '/';
 }
 
@@ -319,7 +323,7 @@ function applyReturnColours_(sh, firstRow, cols) {
 }
 
 function ss_settingCell_(name) {
-  const r = SpreadsheetApp.getActive().getRangeByName(name);
+  const r = ss_().getRangeByName(name);
   return '$B$' + r.getRow();
 }
 
@@ -563,7 +567,7 @@ function refresh_(manifest) {
   const lock = LockService.getDocumentLock();
   if (!lock.tryLock(30000)) return;
   try {
-    const ss = SpreadsheetApp.getActive();
+    const ss = ss_();
     if (!ss.getSheetByName(TAB.set) || !ss.getRangeByName('MIN_1Y')) setupScreener();
     const base = dataUrl_();
     const funds = fetchCsv_(base + 'funds.csv');
@@ -745,7 +749,7 @@ function seedHistory_(ss, rows) {
 }
 
 function reseedHistory() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = ss_();
   const h = ss.getSheetByName(TAB.hist);
   if (h.getLastRow() > 4) h.getRange(5, 1, h.getLastRow() - 4, HIST_HDR.length).clearContent();
   seedHistory_(ss, fetchCsv_(dataUrl_() + 'backfill.csv'));
