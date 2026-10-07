@@ -1,0 +1,24 @@
+# Manual fallback. The scheduled Saturday run is done by a Claude scheduled task;
+# uncomment the schedule block to have GitHub Actions run it instead.
+name: refresh-data
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "47 12 * * 6"   # Saturday 12:47 UTC (8:47 AM EDT / 6:17 PM IST)
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r pipeline/requirements.txt
+      - run: python pipeline/mf_pipeline.py --out data --workers 16 && rm -rf data/_raw && python pipeline/validate.py data
+      - run: |
+          git config user.name "mf-screener bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data && git commit -m "Data refresh $(date -u +%F)" || exit 0
+          git push
