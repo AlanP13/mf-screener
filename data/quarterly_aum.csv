@@ -1370,7 +1370,6 @@ code,name,category,Oct-Dec 2024,Jan-Mar 2025,Apr-Jun 2025,Jul-Sep 2025,Oct-Dec 2
 153040,PGIM India Healthcare Fund,Sectoral/Thematic,27.23,104.85,107.9,109.88,102.91,90.69,94.43,118.25
 153042,Franklin India Arbitrage Fund,Arbitrage,72.59,188.27,277.17,432.38,599.68,764.23,1274.95,1675.86
 153046,Invesco India Multi Asset Allocation Fund,Multi Asset Allocation,48.43,325.45,371.76,452.35,584.28,871.08,1078.11,1202.45
-153050,Axis CRISIL-IBX AAA Bond Financial Services - Sep 2027 Index Fund,Index - Debt,60.88,136.49,90.61,44.65,23.07,21.87,11.32,4.63
 153059,Tata India Innovation Fund,Sectoral/Thematic,627.51,1644.96,1686.23,1749.73,1694.82,1453.91,1366.06,1347.6
 153061,Nippon India Nifty Realty Index Fund,Index - Equity,6.1,17.86,23.89,23.5,30.82,33.3,44.27,57.99
 153066,Nippon India Nifty Auto Index Fund,Index - Equity,11.67,32.91,29.74,32.2,39.26,41.29,42.05,48.6
@@ -1403,7 +1402,6 @@ code,name,category,Oct-Dec 2024,Jan-Mar 2025,Apr-Jun 2025,Jul-Sep 2025,Oct-Dec 2
 153155,Bajaj Finserv Healthcare Fund,Sectoral/Thematic,15.78,299.32,315.12,336.0,334.26,312.59,329.96,388.57
 153162,ICICI Prudential Nifty 500 Index Fund,Index - Equity,1.87,17.25,23.9,31.91,49.79,67.28,86.51,100.16
 153170,Baroda BNP Paribas Children's Fund,Children's,2.24,72.02,83.11,94.62,105.37,110.04,115.77,126.23
-153174,Axis CRISIL-IBX AAA Bond NBFC-HFC - Jun 2027 Index Fund,Index - Debt,10.22,40.49,45.2,46.14,50.78,55.78,28.89,7.48
 153177,Aditya Birla Sun Life Crisil-IBX Financial Services 3 to 6 months Debt Index Fund,Index - Equity,165.21,2732.38,3415.36,3365.31,3369.08,3024.46,3060.26,2484.77
 153181,ICICI Prudential Rural Opportunities Fund,Sectoral/Thematic,,863.33,1381.39,1774.91,2128.72,2205.52,2075.68,2060.05
 153188,Motilal Oswal Arbitrage Fund,Arbitrage,26.81,654.37,682.89,1062.96,1685.88,2212.45,2584.5,3318.53
@@ -1454,7 +1452,6 @@ code,name,category,Oct-Dec 2024,Jan-Mar 2025,Apr-Jun 2025,Jul-Sep 2025,Oct-Dec 2
 153377,UNIFI DYNAMIC ASSET ALLOCATION FUND,Balanced Advantage,,110.26,616.31,783.52,967.37,1118.89,1215.78,1390.62
 153382,Mirae Asset BSE 200 Equal Weight ETF Fund of Fund,FoF Domestic,,1.59,7.44,4.91,5.65,5.89,6.53,7.37
 153387,Mirae Asset BSE Select IPO ETF Fund of Fund,FoF Domestic,,1.58,7.87,6.31,7.66,6.92,7.5,8.91
-153391,Bandhan CRISIL-IBX 10:90 Gilt Plus SDL Index - Dec 2029 Fund,Index - Equity,,3.45,13.03,6.55,0.38,0.38,0.39,0.28
 153396,ICICI Prudential Nifty EV & New Age Automotive ETF FOF,FoF Domestic,,,12.72,21.95,29.77,32.68,38.18,49.45
 153399,Kotak Nifty Midcap 150 Index Fund,Index - Equity,,0.88,5.12,8.51,13.56,20.59,33.36,44.46
 153404,HDFC Nifty Top 20 Equal Weight Index Fund,Index - Equity,,5.5,78.33,79.02,83.12,83.36,84.92,91.16
@@ -1732,6 +1729,9 @@ code,name,category,Oct-Dec 2024,Jan-Mar 2025,Apr-Jun 2025,Jul-Sep 2025,Oct-Dec 2
 154731,Kotak Multi Sector Omni FOF,FoF Domestic,,,,,,,,0.7
 154737,LAKSHYA OVERNIGHT FUND,Overnight,,,,,,,,2.41
 154739,Axis Nifty500 Low Volatility 50 Index Fund,Index - Equity,,,,,,,,0.96
+154741,ICICI Prudential Contra Fund,Contra,,,,,,,,
 154744,Tata CRISIL-IBX Financial Services 3-6 Months Debt Index Fund,Index - Debt,,,,,,,,46.71
 154752,HDFC BSE REITS and Commercial Real Estate Index Fund,Index - Equity,,,,,,,,3.06
 154756,Kotak Nifty Capital Markets Index Fund,Index - Equity,,,,,,,,
+154758,SBI Nifty200 Value 30 ETF FOF,FoF Domestic,,,,,,,,
+154810,Aditya Birla Sun Life Financial Services Sectoral Debt Fund,Sectoral/Thematic,,,,,,,,
