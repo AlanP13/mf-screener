@@ -1,11 +1,11 @@
 {
-  "run_id": "20261017T124750Z",
-  "run_utc": "2026-10-17T12:47:50+00:00",
-  "asof_ist": "2026-10-17",
-  "latest_nav_date": "2026-10-18",
-  "universe_rows": 14390,
-  "funds": 1736,
-  "history_ok": 1734,
+  "run_id": "20261024T125817Z",
+  "run_utc": "2026-10-24T12:58:17+00:00",
+  "asof_ist": "2026-10-24",
+  "latest_nav_date": "2026-10-25",
+  "universe_rows": 14412,
+  "funds": 1742,
+  "history_ok": 1740,
   "history_failed": 0,
   "kuvera_ok": 1348,
   "aaum_quarters": [
@@ -53,9 +53,9 @@
   ],
   "ter_month": "08-2026, 09-2026, 10-2026",
   "flags": {
-    "history lags NAVAll": 73,
+    "history lags NAVAll": 69,
     "NAV history rebased (face value change)": 60,
-    "no AUM": 7,
+    "no AUM": 13,
     "no NAV history": 2
   }
 }
